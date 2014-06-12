@@ -94,7 +94,8 @@ Function Manual-Time{
 Function Set-DNS{
 # Prompt for Primary and Alternate DNS Servers
 $dnspri = read-host "Enter Primary DNS"
-$dnsalt = read-host "Enter Alternate DNS"
+$dnssec = read-host "Enter Secondary DNS"
+$dnster = read-host "Enter Tertiary DNS"
 
 # Prompt for Domain
 $domainname = read-host "Enter Domain Name"
@@ -102,7 +103,7 @@ $domainname = read-host "Enter Domain Name"
 foreach ($esx in $esxHosts) {
 
    Write-Host "Configuring DNS and Domain Name on $esx" -ForegroundColor Green
-   Get-VMHostNetwork -VMHost $esx | Set-VMHostNetwork -DomainName $domainname -DNSAddress $dnspri , $dnsalt -Confirm:$false
+   Get-VMHostNetwork -VMHost $esx | Set-VMHostNetwork -DomainName $domainname -DNSAddress $dnspri , $dnssec , $dnster -Confirm:$false
 
    Write-Host "Done!  Press any key to return to menu...." -ForegroundColor Green
    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
@@ -115,11 +116,13 @@ Function Set-NTP{
 #Prompt for NTP Servers
 $ntpone = read-host "Enter NTP Server One"
 $ntptwo = read-host "Enter NTP Server Two"
+$ntpthree = read-host "Enter NTP Server Three"
+$ntpfour = read-host "Enter NTP Server Four"
 
 foreach ($esx in $esxHosts) {
 
    Write-Host "Configuring NTP Servers on $esx" -ForegroundColor Green
-   Add-VMHostNTPServer -NtpServer $ntpone , $ntptwo -VMHost $esx -Confirm:$false
+   Add-VMHostNTPServer -NtpServer $ntpone , $ntptwo , $ntpthree , $ntpfour -VMHost $esx -Confirm:$false
 
    Write-Host "Allow NTP queries outbound through the firewall on $esx" -ForegroundColor Green
    Get-VMHostFirewallException -VMHost $esx | where {$_.Name -eq "NTP client"} | Set-VMHostFirewallException -Enabled:$true
